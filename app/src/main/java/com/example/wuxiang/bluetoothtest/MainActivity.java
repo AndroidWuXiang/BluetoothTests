@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                             lv.setAdapter(baseAdapter);
                         }
                     }else{
-                        System.out.println("还没有已配对的远程蓝牙设备！");
+                       Toast.makeText(MainActivity.this,"还没有已配对的远程蓝牙设备！",Toast.LENGTH_SHORT).show();
                     }
     }
     private void setListener(){
@@ -117,11 +117,30 @@ public class MainActivity extends AppCompatActivity {
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
                     setProgressBarIndeterminateVisibility(false);
                     setTitle("搜索蓝牙设备");
-                    System.out.println("ACTION_DISCOVERY_FINISHED");
                     break;
                 case BluetoothAdapter.ACTION_STATE_CHANGED:
+                    int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,BluetoothAdapter.ERROR);
+                    switch (state){
+                        case BluetoothAdapter.STATE_ON:
+                            System.out.println("STATE_ON");
+                            t.setChecked(true);
+                        case BluetoothAdapter.STATE_OFF:
+                            System.out.println("STATE_OFF");
+                            if(!mBluetoothAdapter.isEnabled()){
+                                t.setChecked(false);
+                                list.removeAll(list);
+                                baseAdapter.notifyDataSetChanged();
+                                lv.setAdapter(baseAdapter);
+                            }
+                            //t.setChecked(false);
+
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 case BluetoothDevice.ACTION_FOUND:
+                    System.out.println("ACTION_FOUND");
                     HashMap<String,String> map = new HashMap<String, String>();
                     devices = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     if (devices.getBondState() != BluetoothDevice.BOND_BONDED) {
