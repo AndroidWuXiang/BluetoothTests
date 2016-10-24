@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter;
     private ListView lv;
     private List<HashMap<String,String>> list;
+    private List<BluetoothDevice> list_device;
     private MyBaseAdapter baseAdapter;
     private BluetoothDevice devices;
     @Override
@@ -42,17 +44,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         list = new ArrayList<HashMap<String,String>>();
+        System.out.println("1232213");
         init();
         setListener();
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(myReceiver, filter);
-       /* filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-        filter.addAction(BluetoothDevice.ACTION_FOUND);
-        filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        filter.addAction(BluetoothDevice.ACTION_FOUND);
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);*/
         filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(myReceiver, filter);
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
@@ -86,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(t.isChecked()){
+                    System.out.println("12344の22");
                     mBluetoothAdapter.enable();
                 }else{
                     Toast.makeText(MainActivity.this,"关闭蓝牙",Toast.LENGTH_SHORT).show();
@@ -108,6 +106,12 @@ public class MainActivity extends AppCompatActivity {
                     mBluetoothAdapter.startDiscovery();
             }
         });
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+        });
     }
     private BroadcastReceiver myReceiver = new BroadcastReceiver() {
         @Override
@@ -115,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
             String action = intent.getAction();
             switch (action){
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
+                    System.out.println("ACTION_DISCOVERY_FINISHED");
                     setProgressBarIndeterminateVisibility(false);
                     setTitle("搜索蓝牙设备");
                     break;
@@ -132,8 +137,6 @@ public class MainActivity extends AppCompatActivity {
                                 baseAdapter.notifyDataSetChanged();
                                 lv.setAdapter(baseAdapter);
                             }
-                            //t.setChecked(false);
-
                             break;
                         default:
                             break;
@@ -148,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
                         map.put("address",devices.getAddress());
                         list.add(map);
                         System.out.println(devices.getName());
+                       /* System.out.println("远程设备名称："+mBluetoothAdapter.getRemoteDevice(devices.getAddress()).getName());*/
                     }
                     lv.setAdapter(baseAdapter);
                     break;
